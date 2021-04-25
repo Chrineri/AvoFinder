@@ -14,7 +14,7 @@ sia degli studenti che dei nuovi insegnanti, le aule all'interno della scuola.</
 **PHP**<br>
 **DBMS MySQL**<br>
 
-<p>Per la creazione dell'applicazione ci siamo serviti di Android Studio e tramite una libreria (**Osmdroid**) che permette l'utilizzo di OpenStreetMap su Android.
+<p>Per la creazione dell'applicazione ci siamo serviti di Android Studio e tramite una libreria (<strong>Osmdroid</strong>) che permette l'utilizzo di OpenStreetMap su Android.
 Abbiamo realizzato la mappa partendo da un file GeoJSON precedentemente creato da alcuni studenti dell'Avogadro. 
 Per la parte backend abbiamo realizzato un server Java che si interfaccia con un sito Altervista contenente il database mySQL. 
 Inoltre vi è un sito creato in HTML, CSS, JS e PHP per la gestione del database, accesso che sarà disponibile solo a un utente admin.
