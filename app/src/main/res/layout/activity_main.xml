@@ -22,16 +22,14 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginStart="52dp"
+            android:layout_marginStart="25dp"
             android:layout_marginTop="9dp"
             android:layout_marginEnd="324dp"
-            android:layout_marginBottom="685dp"
             android:backgroundTint="#F1C047"
             android:text="0"
             android:textColor="#104281"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
@@ -42,17 +40,14 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginStart="84dp"
             android:layout_marginTop="9dp"
-            android:layout_marginEnd="292dp"
-            android:layout_marginBottom="685dp"
+            android:layout_marginLeft="35dp"
             android:backgroundTint="#F1C047"
             android:text="1"
             android:textColor="#104281"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintStart_toStartOf="@id/l0"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
@@ -62,17 +57,14 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginStart="116dp"
+            android:layout_marginLeft="35dp"
             android:layout_marginTop="9dp"
-            android:layout_marginEnd="260dp"
-            android:layout_marginBottom="685dp"
             android:backgroundTint="#f1c047"
             android:text="2"
             android:textColor="#104281"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintStart_toStartOf="@id/l1"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
@@ -82,17 +74,14 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginStart="148dp"
+            android:layout_marginLeft="35dp"
             android:layout_marginTop="9dp"
-            android:layout_marginEnd="228dp"
-            android:layout_marginBottom="685dp"
             android:backgroundTint="#f1c047"
             android:text="3"
             android:textColor="#104281"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintStart_toStartOf="@id/l2"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
@@ -102,41 +91,37 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginStart="180dp"
+            android:layout_marginLeft="35dp"
             android:layout_marginTop="9dp"
-            android:layout_marginEnd="196dp"
-            android:layout_marginBottom="685dp"
             android:backgroundTint="#f1c047"
             android:text="4"
             android:textColor="#104281"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintStart_toStartOf="@id/l3"
             app:layout_constraintTop_toTopOf="parent"
             tools:visibility="visible" />
 
         <org.osmdroid.views.MapView
             android:id="@+id/map"
             tilesource="Mapnik"
-            android:layout_width="412dp"
-            android:layout_height="690dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginTop="46dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@id/textView"
             app:layout_constraintVertical_bias="1.0">
 
         </org.osmdroid.views.MapView>
 
         <TextView
             android:id="@+id/textView"
-            android:layout_width="415dp"
+            android:layout_width="match_parent"
             android:layout_height="58dp"
-            android:layout_marginEnd="3dp"
-            android:layout_marginBottom="700dp"
+            android:layout_marginEnd="0dp"
             android:background="@drawable/bottomborder"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -148,14 +133,11 @@
         <ImageButton
             android:id="@+id/imageButton5"
             android:layout_width="64dp"
-            android:layout_height="51dp"
-            android:layout_marginStart="320dp"
-            android:layout_marginEnd="27dp"
-            android:layout_marginBottom="690dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="15dp"
             android:backgroundTint="#00FFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/profilo" />
 
@@ -163,18 +145,15 @@
             android:id="@+id/check"
             android:layout_width="35dp"
             android:layout_height="37dp"
-            android:layout_marginStart="239dp"
+            android:layout_marginLeft="35dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="137dp"
-            android:layout_marginBottom="684dp"
             android:alpha="1"
             android:backgroundTint="#F1C047"
             android:buttonTint="#F1C047"
             android:checked="false"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintStart_toStartOf="@id/l4"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

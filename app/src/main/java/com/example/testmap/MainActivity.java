@@ -29,6 +29,12 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,18 +67,23 @@ public class MainActivity extends AppCompatActivity{
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
+
         }
         setContentView(R.layout.activity_main);
 
-        map = (MapView) findViewById(R.id.map);
-        map.setTileSource(TileSourceFactory.MAPNIK);
+        map = (MapView) findViewById(R.id.map);  //Creazione dell'oggetto mapView
+        map.setTileSource(TileSourceFactory.MAPNIK);  //Imposto il tipo di mappa
         map.setTilesScaledToDpi(true);
-        map.setMultiTouchControls(true);
+        RotationGestureOverlay rg = new RotationGestureOverlay(map);
+        rg.setEnabled(true);
+        map.setMultiTouchControls(true);  //Abilito lo zoom con le dita
+        map.getOverlays().add(rg);
 
 
-        KmlDocument kmlDocument = new KmlDocument();
+        KmlDocument kmlDocument = new KmlDocument();  //Creo un oggetto KmlDocument che permette la conversione dei formati geojson
 
 
+        //Leggo il file geojson contenente la mappa scolastica e lo converto in formato KML
         try {
             InputStream is = getAssets().open("mappa.geojson");
             int size = is.available();
@@ -86,17 +97,40 @@ public class MainActivity extends AppCompatActivity{
         }
 
 
-
+        //Vado a impostare i paramentri per l'inserimento della piantina formato KML nella mappa OSM
         Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         Style defaultStyle = new Style(defaultBitmap, Color.parseColor("#104281"), 5f, Color.parseColor("#f1c047"));
         FolderOverlay geoJsonOverlay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(map, defaultStyle, null, kmlDocument);
 
-        l = geoJsonOverlay.getItems();
+        l = geoJsonOverlay.getItems(); //Prendo tutti gli oggetti che compongono la piantina scolastica
+        CheckBox c = (CheckBox) findViewById(R.id.check);
+
+        //Metto ogni oggetto in un arraylist di polygoni
+        p = (List<Polygon>) l;
 
 
-        for(int i=0;i<l.size();i++) {
-            p = (List<Polygon>) l;
+        for(int i=0;i<l.size();i++){
+
+                CustomInfoWindow ci = new CustomInfoWindow(map,p.get(i));
+                p.get(i).setInfoWindow(ci);
+                int counter = i;//counter che serve al metodo sottostante
+                p.get(i).setOnClickListener(new Polygon.OnClickListener() {
+                    @Override
+                    public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos) {
+                        InfoWindow.closeAllInfoWindowsOn(map);//se viene cliccato un poligono diverso da quello attualmente attivo vengono chiuse tutte le infowindow attive
+                        p.get(counter).showInfoWindow();//attiva l'infowindow del poligono selezionato
+                        return true;
+                    }
+                });
+
+        }
+
+
+        //Imposto il piano 0 inizialmente
+        for(int i=0;i<p.size();i++) {
+            if(p.get(i).getSubDescription().contains("level=0"))
+                map.getOverlays().add(p.get(i));
         }
 
 
@@ -105,9 +139,12 @@ public class MainActivity extends AppCompatActivity{
         Button p2 = (Button) findViewById(R.id.l2);
         Button p3 = (Button) findViewById(R.id.l3);
         Button p4 = (Button) findViewById(R.id.l4);
-        CheckBox c = (CheckBox) findViewById(R.id.check);
+
         p0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
         p0.setTextColor(Color.WHITE);
+
+        
+
 
         p0.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -115,23 +152,29 @@ public class MainActivity extends AppCompatActivity{
                 p0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                 p0.setTextColor(Color.WHITE);
                 piano = 0;
-                if(c.isChecked()){
-                    setMarker();
-                }
+
 
 
                 for(int i=0;i<p.size();i++) {
 
                     if(p.get(i).getSubDescription().contains("level=0")) {
-                        p.get(i).setEnabled(true);
+                        map.getOverlays().add(p.get(i));
                         map.invalidate();
                     }else {
-                        p.get(i).setEnabled(false);
+                        map.getOverlays().remove(p.get(i));
+                        map.invalidate();
                     }
             /*if(p.get(i).getTitle().equals("4-13"))
                 p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
             else
                 p.get(i).getFillPaint().setColor(Color.GREEN);*/
+                }
+
+
+                if(c.isChecked()){
+                    setMarker();
+                }else{
+                    InfoWindow.closeAllInfoWindowsOn(map);
                 }
             }
         });
@@ -145,22 +188,26 @@ public class MainActivity extends AppCompatActivity{
                 p1.setTextColor(Color.WHITE);
                 piano = 1;
 
-                if(c.isChecked()){
-                    setMarker();
-                }
 
                 for(int i=0;i<p.size();i++) {
 
                     if(p.get(i).getSubDescription().contains("level=1")) {
-                        p.get(i).setEnabled(true);
+                        map.getOverlays().add(p.get(i));
                         map.invalidate();
                     }else {
-                        p.get(i).setEnabled(false);
+                        map.getOverlays().remove(p.get(i));
+                        map.invalidate();
                     }
             /*if(p.get(i).getTitle().equals("4-13"))
                 p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
             else
                 p.get(i).getFillPaint().setColor(Color.GREEN);*/
+                }
+
+                if(c.isChecked()){
+                    setMarker();
+                }else{
+                    InfoWindow.closeAllInfoWindowsOn(map);
                 }
             }
         });
@@ -172,22 +219,26 @@ public class MainActivity extends AppCompatActivity{
                 p2.setTextColor(Color.WHITE);
                 piano = 2;
 
-                if(c.isChecked()){
-                    setMarker();
-                }
-
                 for(int i=0;i<p.size();i++) {
 
                     if(p.get(i).getSubDescription().contains("level=2")) {
-                        p.get(i).setEnabled(true);
+                        map.getOverlays().add(p.get(i));
                         map.invalidate();
                     }else {
-                        p.get(i).setEnabled(false);
+                        map.getOverlays().remove(p.get(i));
+                        map.invalidate();
                     }
             /*if(p.get(i).getTitle().equals("4-13"))
                 p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
             else
                 p.get(i).getFillPaint().setColor(Color.GREEN);*/
+                }
+
+
+                if(c.isChecked()){
+                    setMarker();
+                }else{
+                    InfoWindow.closeAllInfoWindowsOn(map);
                 }
             }
         });
@@ -199,22 +250,26 @@ public class MainActivity extends AppCompatActivity{
                 p3.setTextColor(Color.WHITE);
                 piano = 3;
 
-                if(c.isChecked()){
-                    setMarker();
-                }
 
                 for(int i=0;i<p.size();i++) {
 
                     if(p.get(i).getSubDescription().contains("level=3")) {
-                        p.get(i).setEnabled(true);
+                        map.getOverlays().add(p.get(i));
                         map.invalidate();
                     }else {
-                        p.get(i).setEnabled(false);
+                        map.getOverlays().remove(p.get(i));
+                        map.invalidate();
                     }
             /*if(p.get(i).getTitle().equals("4-13"))
                 p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
             else
                 p.get(i).getFillPaint().setColor(Color.GREEN);*/
+                }
+
+                if(c.isChecked()){
+                    setMarker();
+                }else{
+                    InfoWindow.closeAllInfoWindowsOn(map);
                 }
             }
         });
@@ -226,22 +281,27 @@ public class MainActivity extends AppCompatActivity{
                 p4.setTextColor(Color.WHITE);
                 piano = 4;
 
-                if(c.isChecked()){
-                    setMarker();
-                }
+
 
                 for(int i=0;i<p.size();i++) {
 
                     if(p.get(i).getSubDescription().contains("level=4")) {
-                        p.get(i).setEnabled(true);
+                        map.getOverlays().add(p.get(i));
                         map.invalidate();
                     }else {
-                        p.get(i).setEnabled(false);
+                        map.getOverlays().remove(p.get(i));
+                        map.invalidate();
                     }
             /*if(p.get(i).getTitle().equals("4-13"))
                 p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
             else
                 p.get(i).getFillPaint().setColor(Color.GREEN);*/
+                }
+
+                if(c.isChecked()){
+                    setMarker();
+                }else{
+                    InfoWindow.closeAllInfoWindowsOn(map);
                 }
             }
         });
@@ -251,22 +311,25 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
 
                 if(c.isChecked()){
+                    InfoWindow.closeAllInfoWindowsOn(map);
                         for(int i=0;i<p.size();i++) {
                         if(p.get(i).getSubDescription().contains("level="+piano)) {
                             if(p.get(i).getTitle()!=null) {
-                                p.get(i).setEnabled(true);
+                                map.getOverlays().add(p.get(i));
 
                                 Marker m = new Marker(map);
                                 m.setTextLabelBackgroundColor(Color.TRANSPARENT);
                                 m.setTextLabelForegroundColor(Color.BLACK);
                                 m.setTextIcon(p.get(i).getTitle());
                                 m.setPosition(p.get(i).getInfoWindowLocation());
+                                m.setInfoWindow(null);
                                 map.getOverlayManager().add(m);
                                 markers.add(m);
                                 map.invalidate();
                             }
                         }else {
-                            p.get(i).setEnabled(false);
+                            map.getOverlays().remove(p.get(i));
+                            map.invalidate();
                         }
                     }
                 }else{
@@ -278,8 +341,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-
-        map.getOverlays().add(geoJsonOverlay);
+        //map.getOverlays().add(geoJsonOverlay);
 
         map.setHorizontalMapRepetitionEnabled(false);
         map.setVerticalMapRepetitionEnabled(false);
@@ -305,19 +367,21 @@ public class MainActivity extends AppCompatActivity{
         for (int i = 0; i < p.size(); i++) {
             if (p.get(i).getSubDescription().contains("level=" + piano)) {
                 if (p.get(i).getTitle() != null) {
-                    p.get(i).setEnabled(true);
+                    map.getOverlays().add(p.get(i));
 
                     Marker m = new Marker(map);
                     m.setTextLabelBackgroundColor(Color.TRANSPARENT);
                     m.setTextLabelForegroundColor(Color.BLACK);
                     m.setTextIcon(p.get(i).getTitle());
                     m.setPosition(p.get(i).getInfoWindowLocation());
+                    m.setInfoWindow(null);
                     map.getOverlayManager().add(m);
                     markers.add(m);
                     map.invalidate();
                 }
             } else {
-                p.get(i).setEnabled(false);
+                map.getOverlays().remove(p.get(i));
+                map.invalidate();
             }
         }
     }
