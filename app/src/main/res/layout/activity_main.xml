@@ -40,8 +40,8 @@
             android:layout_height="37dp"
 
 
-            android:layout_marginTop="9dp"
             android:layout_marginLeft="35dp"
+            android:layout_marginTop="9dp"
             android:backgroundTint="#F1C047"
             android:text="1"
             android:textColor="#104281"
@@ -130,16 +130,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
-        <ImageButton
-            android:id="@+id/imageButton5"
-            android:layout_width="64dp"
-            android:layout_height="match_parent"
-            android:layout_marginRight="15dp"
-            android:backgroundTint="#00FFFFFF"
-            app:layout_constraintBottom_toBottomOf="@id/textView"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/profilo" />
 
         <CheckBox
             android:id="@+id/check"
@@ -154,6 +144,17 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="@id/textView"
             app:layout_constraintStart_toStartOf="@id/l4"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Spinner
+            android:id="@+id/Spinner"
+            android:layout_width="37dp"
+            android:layout_height="35dp"
+            android:layout_marginEnd="15dp"
+            android:background="@drawable/ic_baseline_more_vert_24"
+            android:textColor="#104281"
+            app:layout_constraintBottom_toBottomOf="@id/textView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

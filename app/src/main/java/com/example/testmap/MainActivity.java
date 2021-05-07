@@ -1,18 +1,27 @@
 package com.example.testmap;
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
+
 import android.graphics.drawable.Drawable;
+
 import android.os.Build;
 import android.os.Bundle;
+
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.View;
+
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,17 +38,19 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
-import org.osmdroid.views.overlay.gestures.RotationGestureDetector;
+
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
+
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 
 public class MainActivity extends AppCompatActivity{
@@ -47,13 +58,33 @@ public class MainActivity extends AppCompatActivity{
     private MapView map = null;
     private List l;
     private List<Polygon> p = null;
+    private List<Polygon> p0 = new ArrayList<>();
+    private List<Polygon> p1 = new ArrayList<>();
+    private List<Polygon> p2 = new ArrayList<>();
+    private List<Polygon> p3 = new ArrayList<>();
+    private List<Polygon> p4 = new ArrayList<>();
     private int piano = 0;
     List<Marker> markers = new ArrayList<>();
+    Spinner s;
+    String getClass="";
+    CheckBox c;
+    String[] pol;
+    Polygon[] stu;
+    String[] passed;
+    Button b0;
+    Button b1;
+    Button b2;
+    Button b3;
+    Button b4;
 
 
+
+
+    @SuppressLint("UseCompatLoadingForColorStateLists")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+         super.onCreate(savedInstanceState);
 
 
 
@@ -69,7 +100,35 @@ public class MainActivity extends AppCompatActivity{
             }
 
         }
+
+
+
         setContentView(R.layout.activity_main);
+
+
+
+        s = findViewById(R.id.Spinner);
+        List<String> list = new ArrayList<String>();
+        list.add("\uD83D\uDC64 Login    ");
+        list.add("\uD83D\uDEAA Aule     ");
+        list.add("⌚ Orario   ");
+        list.add("");
+        final int listsize = list.size() - 1;
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, list) {
+            @Override
+            public int getCount() {
+                return(listsize); // Truncate the list
+            }
+        };
+
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        s.setAdapter(dataAdapter);
+        s.setSelection(listsize);
+
+
+
+
 
         map = (MapView) findViewById(R.id.map);  //Creazione dell'oggetto mapView
         map.setTileSource(TileSourceFactory.MAPNIK);  //Imposto il tipo di mappa
@@ -77,7 +136,11 @@ public class MainActivity extends AppCompatActivity{
         RotationGestureOverlay rg = new RotationGestureOverlay(map);
         rg.setEnabled(true);
         map.setMultiTouchControls(true);  //Abilito lo zoom con le dita
-        map.getOverlays().add(rg);
+
+
+
+
+
 
 
         KmlDocument kmlDocument = new KmlDocument();  //Creo un oggetto KmlDocument che permette la conversione dei formati geojson
@@ -98,246 +161,152 @@ public class MainActivity extends AppCompatActivity{
 
 
         //Vado a impostare i paramentri per l'inserimento della piantina formato KML nella mappa OSM
-        Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
+        @SuppressLint("UseCompatLoadingForDrawables") Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
         Style defaultStyle = new Style(defaultBitmap, Color.parseColor("#104281"), 5f, Color.parseColor("#f1c047"));
         FolderOverlay geoJsonOverlay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(map, defaultStyle, null, kmlDocument);
 
         l = geoJsonOverlay.getItems(); //Prendo tutti gli oggetti che compongono la piantina scolastica
-        CheckBox c = (CheckBox) findViewById(R.id.check);
+        c = (CheckBox) findViewById(R.id.check);
 
         //Metto ogni oggetto in un arraylist di polygoni
         p = (List<Polygon>) l;
+        pol  = new String[p.size()];
 
 
-        for(int i=0;i<l.size();i++){
-
-                CustomInfoWindow ci = new CustomInfoWindow(map,p.get(i));
-                p.get(i).setInfoWindow(ci);
-                int counter = i;//counter che serve al metodo sottostante
-                p.get(i).setOnClickListener(new Polygon.OnClickListener() {
-                    @Override
-                    public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos) {
-                        InfoWindow.closeAllInfoWindowsOn(map);//se viene cliccato un poligono diverso da quello attualmente attivo vengono chiuse tutte le infowindow attive
-                        p.get(counter).showInfoWindow();//attiva l'infowindow del poligono selezionato
-                        return true;
-                    }
-                });
-
-        }
-
-
-        //Imposto il piano 0 inizialmente
-        for(int i=0;i<p.size();i++) {
-            if(p.get(i).getSubDescription().contains("level=0"))
-                map.getOverlays().add(p.get(i));
-        }
-
-
-        Button p0 = (Button) findViewById(R.id.l0);
-        Button p1 = (Button) findViewById(R.id.l1);
-        Button p2 = (Button) findViewById(R.id.l2);
-        Button p3 = (Button) findViewById(R.id.l3);
-        Button p4 = (Button) findViewById(R.id.l4);
-
-        p0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-        p0.setTextColor(Color.WHITE);
-
-        
-
-
-        p0.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                setDefaultColor(p0,p1,p2,p3,p4);
-                p0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                p0.setTextColor(Color.WHITE);
-                piano = 0;
+        myThread t = new myThread();
+        t.start();
 
 
 
-                for(int i=0;i<p.size();i++) {
 
-                    if(p.get(i).getSubDescription().contains("level=0")) {
-                        map.getOverlays().add(p.get(i));
-                        map.invalidate();
-                    }else {
-                        map.getOverlays().remove(p.get(i));
-                        map.invalidate();
-                    }
-            /*if(p.get(i).getTitle().equals("4-13"))
-                p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
-            else
-                p.get(i).getFillPaint().setColor(Color.GREEN);*/
+
+        s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                Object item = parent.getItemAtPosition(pos);
+                switch(item.toString()){
+                    case "\uD83D\uDC64 Login    ":
+                        s.setSelection(listsize);
+                        break;
+                    case "\uD83D\uDEAA Aule     ":
+                        Intent i = new Intent(MainActivity.this,aule.class);
+
+                        i.putExtra("polygons",pol);
+                        startActivity(i);
+
+                        s.setSelection(listsize);
+                        break;
+                    case "⌚ Orario   ":
+                        s.setSelection(listsize);
+                        break;
                 }
-
-
-                if(c.isChecked()){
-                    setMarker();
-                }else{
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                }
+            }
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
 
-        p1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+        setInfoWindow();
 
-                setDefaultColor(p0,p1,p2,p3,p4);
-                p1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                p1.setTextColor(Color.WHITE);
+        getPassedValue();
+        if(getIntent().hasExtra("class")){
+        }else {
+            setInitialFloor();
+        }
+
+
+
+        b0 = (Button) findViewById(R.id.l0);
+        b1 = (Button) findViewById(R.id.l1);
+        b2 = (Button) findViewById(R.id.l2);
+        b3 = (Button) findViewById(R.id.l3);
+        b4 = (Button) findViewById(R.id.l4);
+
+        b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+        b0.setTextColor(Color.WHITE);
+
+
+
+
+
+
+        b0.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                setDefaultColor(b0,b1,b2,b3,b4);
+                resetColor();
+                b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                b0.setTextColor(Color.WHITE);
+                piano = 0;
+                setFloor();
+                rg.setEnabled(true);
+                map.getOverlays().add(rg);
+
+            }
+        });
+
+
+        b1.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                resetColor();
+                setDefaultColor(b0,b1,b2,b3,b4);
+                b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                b1.setTextColor(Color.WHITE);
                 piano = 1;
 
 
-                for(int i=0;i<p.size();i++) {
-
-                    if(p.get(i).getSubDescription().contains("level=1")) {
-                        map.getOverlays().add(p.get(i));
-                        map.invalidate();
-                    }else {
-                        map.getOverlays().remove(p.get(i));
-                        map.invalidate();
-                    }
-            /*if(p.get(i).getTitle().equals("4-13"))
-                p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
-            else
-                p.get(i).getFillPaint().setColor(Color.GREEN);*/
-                }
-
-                if(c.isChecked()){
-                    setMarker();
-                }else{
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                }
+                setFloor();
+                rg.setEnabled(true);
+                map.getOverlays().add(rg);
             }
         });
 
-        p2.setOnClickListener(new View.OnClickListener() {
+        b2.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                setDefaultColor(p0,p1,p2,p3,p4);
-                p2.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                p2.setTextColor(Color.WHITE);
+                resetColor();
+                setDefaultColor(b0,b1,b2,b3,b4);
+                b2.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                b2.setTextColor(Color.WHITE);
                 piano = 2;
 
-                for(int i=0;i<p.size();i++) {
-
-                    if(p.get(i).getSubDescription().contains("level=2")) {
-                        map.getOverlays().add(p.get(i));
-                        map.invalidate();
-                    }else {
-                        map.getOverlays().remove(p.get(i));
-                        map.invalidate();
-                    }
-            /*if(p.get(i).getTitle().equals("4-13"))
-                p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
-            else
-                p.get(i).getFillPaint().setColor(Color.GREEN);*/
-                }
-
-
-                if(c.isChecked()){
-                    setMarker();
-                }else{
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                }
+                setFloor();
+                rg.setEnabled(true);
+                map.getOverlays().add(rg);
             }
         });
 
-        p3.setOnClickListener(new View.OnClickListener() {
+        b3.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                setDefaultColor(p0,p1,p2,p3,p4);
-                p3.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                p3.setTextColor(Color.WHITE);
+                resetColor();
+                setDefaultColor(b0,b1,b2,b3,b4);
+                b3.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                b3.setTextColor(Color.WHITE);
                 piano = 3;
 
-
-                for(int i=0;i<p.size();i++) {
-
-                    if(p.get(i).getSubDescription().contains("level=3")) {
-                        map.getOverlays().add(p.get(i));
-                        map.invalidate();
-                    }else {
-                        map.getOverlays().remove(p.get(i));
-                        map.invalidate();
-                    }
-            /*if(p.get(i).getTitle().equals("4-13"))
-                p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
-            else
-                p.get(i).getFillPaint().setColor(Color.GREEN);*/
-                }
-
-                if(c.isChecked()){
-                    setMarker();
-                }else{
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                }
+                setFloor();
+                rg.setEnabled(true);
+                map.getOverlays().add(rg);
             }
         });
 
-        p4.setOnClickListener(new View.OnClickListener() {
+        b4.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                setDefaultColor(p0,p1,p2,p3,p4);
-                p4.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                p4.setTextColor(Color.WHITE);
+                resetColor();
+                setDefaultColor(b0,b1,b2,b3,b4);
+                b4.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                b4.setTextColor(Color.WHITE);
                 piano = 4;
 
-
-
-                for(int i=0;i<p.size();i++) {
-
-                    if(p.get(i).getSubDescription().contains("level=4")) {
-                        map.getOverlays().add(p.get(i));
-                        map.invalidate();
-                    }else {
-                        map.getOverlays().remove(p.get(i));
-                        map.invalidate();
-                    }
-            /*if(p.get(i).getTitle().equals("4-13"))
-                p.get(i).getFillPaint().setColor(Color.BLUE);//Cambiare i colori ai singoli poligoni
-            else
-                p.get(i).getFillPaint().setColor(Color.GREEN);*/
-                }
-
-                if(c.isChecked()){
-                    setMarker();
-                }else{
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                }
+                setFloor();
+                rg.setEnabled(true);
+                map.getOverlays().add(rg);
             }
         });
 
 
         c.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                if(c.isChecked()){
-                    InfoWindow.closeAllInfoWindowsOn(map);
-                        for(int i=0;i<p.size();i++) {
-                        if(p.get(i).getSubDescription().contains("level="+piano)) {
-                            if(p.get(i).getTitle()!=null) {
-                                map.getOverlays().add(p.get(i));
-
-                                Marker m = new Marker(map);
-                                m.setTextLabelBackgroundColor(Color.TRANSPARENT);
-                                m.setTextLabelForegroundColor(Color.BLACK);
-                                m.setTextIcon(p.get(i).getTitle());
-                                m.setPosition(p.get(i).getInfoWindowLocation());
-                                m.setInfoWindow(null);
-                                map.getOverlayManager().add(m);
-                                markers.add(m);
-                                map.invalidate();
-                            }
-                        }else {
-                            map.getOverlays().remove(p.get(i));
-                            map.invalidate();
-                        }
-                    }
-                }else{
-                    for(int i=0;i<markers.size();i++)
-                        map.getOverlayManager().remove(markers.get(i));
-                        map.invalidate();
-                }
-
+                resetColor();
+                checkCheckbox();
             }
         });
 
@@ -352,18 +321,20 @@ public class MainActivity extends AppCompatActivity{
         map.setMinZoomLevel((double) 18);
         map.setScrollableAreaLimitLatitude(45.07146656030419, 45.06952171642693,10);
         map.setScrollableAreaLimitLongitude(7.69138,7.693766902971969,10);
+        map.getOverlays().add(rg);
         requestPermissionsIfNecessary(new String[] {
 
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
         });
-        map.invalidate();
+
 
     }
+
+
 
     public void setMarker() {
         for(int i=0;i<markers.size();i++)
             map.getOverlayManager().remove(markers.get(i));
-            map.invalidate();
         for (int i = 0; i < p.size(); i++) {
             if (p.get(i).getSubDescription().contains("level=" + piano)) {
                 if (p.get(i).getTitle() != null) {
@@ -377,19 +348,17 @@ public class MainActivity extends AppCompatActivity{
                     m.setInfoWindow(null);
                     map.getOverlayManager().add(m);
                     markers.add(m);
-                    map.invalidate();
                 }
             } else {
                 map.getOverlays().remove(p.get(i));
-                map.invalidate();
             }
         }
+        map.invalidate();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
     }
 
@@ -399,6 +368,25 @@ public class MainActivity extends AppCompatActivity{
 
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(intent.hasExtra("class")){
+        getClass = intent.getExtras().getString("class");
+        c.setChecked(false);
+        resetColor();
+
+        getPassedValue();
+
+
+        }
+        else{
+            c.setChecked(false);
+            resetColor();
+        }
+
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -434,6 +422,217 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    public void setFloor(){
+        map.getOverlays().clear();
+
+        switch(piano){
+            case 0: map.getOverlays().addAll(p0);break;
+            case 1: map.getOverlays().addAll(p1);break;
+            case 2: map.getOverlays().addAll(p2);break;
+            case 3: map.getOverlays().addAll(p3);break;
+            case 4: map.getOverlays().addAll(p4);break;
+        }
+
+        if(c.isChecked()){
+            setMarker();
+        }else{
+            if(!InfoWindow.getOpenedInfoWindowsOn(map).isEmpty())
+            InfoWindow.closeAllInfoWindowsOn(map);
+        }
+        map.invalidate();
+    }
+
+    public void checkCheckbox(){
+            if(c.isChecked()){
+                    InfoWindow.closeAllInfoWindowsOn(map);
+                        for(int i=0;i<p.size();i++) {
+                        if(p.get(i).getSubDescription().contains("level="+piano)) {
+                            if(p.get(i).getTitle()!=null) {
+                                map.getOverlays().add(p.get(i));
+
+                                Marker m = new Marker(map);
+                                m.setTextLabelBackgroundColor(Color.TRANSPARENT);
+                                m.setTextLabelForegroundColor(Color.BLACK);
+                                m.setTextIcon(p.get(i).getTitle());
+                                m.setPosition(p.get(i).getInfoWindowLocation());
+                                m.setInfoWindow(null);
+                                map.getOverlayManager().add(m);
+                                markers.add(m);
+                            }
+                        }else {
+                            map.getOverlays().remove(p.get(i));
+                        }
+                    }
+                }else{
+                    for(int i=0;i<markers.size();i++)
+                        map.getOverlayManager().remove(markers.get(i));
+                }
+
+                map.invalidate();
+        }
+
+
+
+
+    public void getPassedValue(){
+
+        if(getIntent().hasExtra("class")){
+            getClass = getIntent().getExtras().getString("class");
+        }
+
+        //cambio il colore dei poligoni selezionati e passati dall'activity aule
+        if(!getClass.equals("")){
+            setDefaultColor(b0,b1,b2,b3,b4);
+            map.getOverlays().clear();
+            passed = getClass.split(";");
+            piano = Integer.parseInt(passed[1]);
+            switch(Integer.parseInt(passed[1])){
+                case 0:
+
+                    map.getOverlays().addAll(p0);
+                    for(int i=0;i<p0.size();i++){
+                        if(passed[0].equals(p0.get(i).getTitle())){
+                            p0.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p0.get(i).showInfoWindow();
+                            b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                            b0.setTextColor(Color.WHITE);
+                        }
+                    }
+                    break;
+                case 1:
+                    map.getOverlays().addAll(p1);
+                    for(int i=0;i<p1.size();i++){
+                        if(passed[0].equals(p1.get(i).getTitle())){
+                            p1.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p1.get(i).showInfoWindow();
+                            b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                            b1.setTextColor(Color.WHITE);
+                        }
+                    }
+                    break;
+                case 2:
+                    map.getOverlays().addAll(p2);
+                    for(int i=0;i<p2.size();i++){
+                        if(passed[0].equals(p2.get(i).getTitle())){
+                            p2.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p2.get(i).showInfoWindow();
+                            b2.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                            b2.setTextColor(Color.WHITE);
+                        }
+                    }
+                    break;
+                case 3:
+                    map.getOverlays().addAll(p3);
+                    for(int i=0;i<p3.size();i++){
+                        if(passed[0].equals(p3.get(i).getTitle())){
+                            p3.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p3.get(i).showInfoWindow();
+                            b3.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                            b3.setTextColor(Color.WHITE);
+                        }
+                    }
+                    break;
+                case 4:
+                    map.getOverlays().addAll(p4);
+                    for(int i=0;i<p4.size();i++){
+                        if(passed[0].equals(p4.get(i).getTitle())){
+                            p4.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p4.get(i).showInfoWindow();
+                            b4.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
+                            b4.setTextColor(Color.WHITE);
+                        }
+                    }
+                    break;
+            }
+            RotationGestureOverlay rg = new RotationGestureOverlay(map);
+            rg.setEnabled(true);
+            map.setMultiTouchControls(true);
+            map.getOverlays().add(rg);
+        }
+        map.invalidate();
+    }
+
+    public void setInitialFloor(){
+        //Imposto il piano 0 inizialmente
+        map.getOverlays().addAll(p0);
+        map.invalidate();
+    }
+
+    public void setInfoWindow(){
+        for(int i=0;i<l.size();i++){
+
+            CustomInfoWindow ci = new CustomInfoWindow(map,p.get(i));
+            p.get(i).setInfoWindow(ci);
+            int counter = i;//counter che serve al metodo sottostante
+            p.get(i).setOnClickListener(new Polygon.OnClickListener() {
+                @Override
+                public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos) {
+                    InfoWindow.closeAllInfoWindowsOn(map);//se viene cliccato un poligono diverso da quello attualmente attivo vengono chiuse tutte le infowindow attive
+                    p.get(counter).showInfoWindow();//attiva l'infowindow del poligono selezionato
+                    return true;
+                }
+            });
+
+        }
+    }
+
+
+    public void addInArray(){
+        //Aggiungo i nomi delle aule in un array di strighe da passare alle altre activity
+
+        int index = 0;
+        for(int i=0;i<p.size();i++){
+            if(p.get(i).getTitle() != null){
+                if(p.get(i).getSubDescription().contains("level=0"))
+                    pol[index] = p.get(i).getTitle()+";0";
+                if(p.get(i).getSubDescription().contains("level=1"))
+                    pol[index] = p.get(i).getTitle()+";1";
+                if(p.get(i).getSubDescription().contains("level=2"))
+                    pol[index] = p.get(i).getTitle()+";2";
+                if(p.get(i).getSubDescription().contains("level=3"))
+                    pol[index] = p.get(i).getTitle()+";3";
+                if(p.get(i).getSubDescription().contains("level=4"))
+                    pol[index] = p.get(i).getTitle()+";4";
+
+                index++;
+            }
+        }
+    }
+
+
+    public void resetColor(){
+
+        if(passed!=null) {
+            InfoWindow.closeAllInfoWindowsOn(map);
+
+
+            switch (Integer.parseInt(passed[1])) {
+                case 0:
+                    for (int i = 0; i < p0.size(); i++)
+                        p0.get(i).getFillPaint().setColor(Color.parseColor("#FFF1C047"));//Cambiare i colori ai singoli poligoni
+                    break;
+                case 1:
+                    for (int i = 0; i < p1.size(); i++)
+                        p1.get(i).getFillPaint().setColor(Color.parseColor("#FFF1C047"));//Cambiare i colori ai singoli poligoni
+                    break;
+                case 2:
+                    for (int i = 0; i < p2.size(); i++)
+                        p2.get(i).getFillPaint().setColor(Color.parseColor("#FFF1C047"));//Cambiare i colori ai singoli poligoni
+                    break;
+                case 3:
+                    for (int i = 0; i < p3.size(); i++)
+                        p3.get(i).getFillPaint().setColor(Color.parseColor("#FFF1C047"));//Cambiare i colori ai singoli poligoni
+                    break;
+                case 4:
+                    for (int i = 0; i < p4.size(); i++)
+                        p4.get(i).getFillPaint().setColor(Color.parseColor("#FFF1C047"));//Cambiare i colori ai singoli poligoni
+                    break;
+            }
+        }
+    }
+
+
+
     private void setDefaultColor(Button b1,Button b2,Button b3,Button b4,Button b5){
         b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.yellow));
         b1.setTextColor(Color.parseColor("#104281"));
@@ -445,5 +644,33 @@ public class MainActivity extends AppCompatActivity{
         b4.setTextColor(Color.parseColor("#104281"));
         b5.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.yellow));
         b5.setTextColor(Color.parseColor("#104281"));
+
     }
+
+    class myThread extends Thread{
+        @Override
+        public void run() {
+            addInArray();
+            for(int i = 0;i<p.size();i++){
+                if(p.get(i).getSubDescription().contains("level=0"))
+                    p0.add(p.get(i));
+                if(p.get(i).getSubDescription().contains("level=1"))
+                    p1.add(p.get(i));
+                if(p.get(i).getSubDescription().contains("level=2"))
+                    p2.add(p.get(i));
+                if(p.get(i).getSubDescription().contains("level=3"))
+                    p3.add(p.get(i));
+                if(p.get(i).getSubDescription().contains("level=4"))
+                    p4.add(p.get(i));
+            }
+            this.interrupt();
+        }
+    }
+
+
+
+
+
+
+
 }
