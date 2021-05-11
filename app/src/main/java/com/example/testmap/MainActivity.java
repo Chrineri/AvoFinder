@@ -187,6 +187,8 @@ public class MainActivity extends AppCompatActivity{
                 switch(item.toString()){
                     case "\uD83D\uDC64 Login    ":
                         s.setSelection(listsize);
+                        Intent openPage1 = new Intent(MainActivity.this,Login.class);
+                        startActivity(openPage1);
                         break;
                     case "\uD83D\uDEAA Aule     ":
                         Intent i = new Intent(MainActivity.this,aule.class);

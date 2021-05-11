@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="131dp"
+        android:layout_marginBottom="579dp"
+        android:src="@drawable/avo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="152dp"
+        android:layout_marginBottom="477dp"
+        android:fontFamily="@font/bungee"
+        android:text="Ci Sei Quasi !"
+        android:textColor="#104281"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="229dp"
+        android:layout_marginBottom="477dp"
+        android:text="Conferma la Mail"
+        android:textColor="#DDA320"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="274dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="314dp"
+        android:layout_marginEnd="19dp"
+        android:layout_marginBottom="143dp"
+        android:fontFamily="sans-serif-medium"
+        android:lineSpacingExtra="8dp"
+        android:text="Per completare la registrazione devi aprire la mail che ti è stata inviata da AvoFinder@gmail.com. Successivamente devi cliccare il link per la conferma della mail. Dopo aver confermato la mail puoi effettuare il login"
+        android:textAlignment="center"
+        android:textColor="#104281"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bottReg"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:layout_marginStart="17dp"
+        android:layout_marginTop="700dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="173dp"
+        android:backgroundTint="#104281"
+        android:text="@string/torna_al_login"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
