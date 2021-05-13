@@ -3,14 +3,17 @@ package com.example.testmap;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.testmap.R;
@@ -33,7 +36,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
-public class Login extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class Login extends AppCompatActivity {
 
 
     TextInputEditText email1;
@@ -44,26 +47,14 @@ public class Login extends AppCompatActivity implements CompoundButton.OnChecked
     String e = "";
     String p = "";
     //Per mantenere loggato
-    private ToggleButton toggleButton;
-    private String logged = "";
+    private CheckBox checkBox;
+    private boolean logged;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
-
-        /*
-        *** Salvo eMail
-         */
-        email1 =findViewById(R.id.email);
-        email = email1.getText();
-
-        /*
-        *** Salvo password
-         */
-        password =findViewById(R.id.psw);
-        pass = password.getText();
 
         /*
         ***Bottone per andare alla registrazione se non si è registrati
@@ -91,10 +82,20 @@ public class Login extends AppCompatActivity implements CompoundButton.OnChecked
             }
         });
         /*
-        ***Toggle button
+        ***CheckBox
          */
-        toggleButton = findViewById(R.id.toggleButton);
-        toggleButton.setOnCheckedChangeListener(this);
+        checkBox = findViewById(R.id.toggleButton);
+        checkBox.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                if(checkBox.isChecked()){
+                    logged = true;
+                }else{
+                    logged = false;
+                }
+            }
+        });
+
 
         /*
         ***Bottone per Login
@@ -104,6 +105,19 @@ public class Login extends AppCompatActivity implements CompoundButton.OnChecked
             public void onClick(View v) {
                 boolean contrE = false;         //Controllo per email
                 boolean contrP = false;         //Controllo per password
+                ////////////////////////////////////////////////////////
+                /*
+                 *** Salvo eMail
+                 */
+                email1 =findViewById(R.id.email);
+                email = email1.getText();
+
+                /*
+                 *** Salvo password
+                 */
+                password =findViewById(R.id.psw);
+                pass = password.getText();
+                ////////////////////////////////////////////////////////////
                 //Editable ---> String
                 e = email.toString();
                 p = pass.toString();
@@ -143,20 +157,6 @@ public class Login extends AppCompatActivity implements CompoundButton.OnChecked
             }
         });
 
-    }
-
-    /*
-    ***Toggle button
-     */
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-        if(toggleButton.isChecked()){
-            logged = "si";
-            System.out.println("ciaoo");
-        }else{
-            logged = "no";
-        }
     }
 
     /*
@@ -229,10 +229,18 @@ public class Login extends AppCompatActivity implements CompoundButton.OnChecked
                 case "1":
                     System.out.println("Login effettuato con successo");
                     //Mettere intent
-                    System.out.print(logged);
+                    System.out.println(logged);
                     /*
                     ***Settare variabili per keep me logged
                      */
+                    SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);      //Creo sharedPreferences
+                    SharedPreferences.Editor ed = sp.edit();        //Per editarlo
+                    ed.putBoolean("log1",logged);         //imposto a logged e in base al suo valore imposta true\false
+                    ed.apply();                         //Applico
+
+                    Intent openPage1 = new Intent(Login.this,MainActivity.class);
+                    startActivity(openPage1);
+
                     break;
                 case "2":
                     password.setError("Errore nel login");

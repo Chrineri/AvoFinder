@@ -7608,7 +7608,7 @@
         "access": "private",
         "indoor": "room",
         "level": "3",
-        "ref": "Laboratorio matematica biennio",
+        "name": "Laboratorio matematica biennio",
         "room": "laboratory"
       },
       "geometry": {

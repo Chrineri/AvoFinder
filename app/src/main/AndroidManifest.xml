@@ -18,7 +18,8 @@
         android:theme="@style/myTheme"
         android:requestLegacyExternalStorage="true"
         >
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,6 +37,9 @@
         <activity android:name=".Registrazione" android:theme="@style/Theme.Registrazione1">
         </activity>
         <activity android:name=".Conferma" android:theme="@style/Theme.Registrazione1">
+
+        </activity>
+        <activity android:name=".Orario" android:theme="@style/Theme.Registrazione1">
 
         </activity>
         <meta-data

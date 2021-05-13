@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF"
@@ -156,17 +159,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:color/transparent" />
 
-    <ToggleButton
+    <CheckBox
         android:id="@+id/toggleButton"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="39dp"
-        android:layout_marginStart="301dp"
-        android:layout_marginTop="483dp"
-        android:layout_marginEnd="45dp"
+        android:layout_marginStart="243dp"
+        android:layout_marginTop="470dp"
+        android:layout_marginEnd="120dp"
         android:layout_marginBottom="209dp"
-        android:text="ToggleButton"
-        android:textOff="No"
-        android:textOn="Si"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -174,19 +174,18 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="255dp"
-        android:layout_height="28dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="483dp"
-        android:layout_marginEnd="90dp"
-        android:layout_marginBottom="214dp"
+        android:layout_width="wrap_content"
+        android:layout_height="23dp"
+        android:layout_marginStart="83dp"
+        android:layout_marginTop="510dp"
         android:text="Resta connesso :"
         android:textAlignment="center"
         android:textColor="#104281"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

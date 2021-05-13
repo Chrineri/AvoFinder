@@ -3,6 +3,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -22,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity{
 
 
 
+
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -109,7 +112,11 @@ public class MainActivity extends AppCompatActivity{
 
         s = findViewById(R.id.Spinner);
         List<String> list = new ArrayList<String>();
-        list.add("\uD83D\uDC64 Login    ");
+        if(!loadSp())
+            list.add("\uD83D\uDC64 Login    ");
+        else
+            list.add("\uD83D\uDC4B Logout    ");
+
         list.add("\uD83D\uDEAA Aule     ");
         list.add("⌚ Orario   ");
         list.add("");
@@ -179,29 +186,41 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-
-
         s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 Object item = parent.getItemAtPosition(pos);
-                switch(item.toString()){
-                    case "\uD83D\uDC64 Login    ":
-                        s.setSelection(listsize);
-                        Intent openPage1 = new Intent(MainActivity.this,Login.class);
-                        startActivity(openPage1);
-                        break;
-                    case "\uD83D\uDEAA Aule     ":
-                        Intent i = new Intent(MainActivity.this,aule.class);
 
-                        i.putExtra("polygons",pol);
-                        startActivity(i);
+                    switch (item.toString()) {
+                        case "\uD83D\uDC64 Login    ":
+                            s.setSelection(listsize);
+                            Intent openPage1 = new Intent(MainActivity.this, Login.class);
+                            startActivity(openPage1);
+                            break;
+                        case "\uD83D\uDC4B Logout    ":
+                            changeSp();
+                            Intent openPage3 = new Intent(MainActivity.this, MainActivity.class);
+                            startActivity(openPage3);
+                            Toast toast = Toast.makeText(getApplicationContext(), "Logout effettuato correttamente", Toast.LENGTH_SHORT);
+                            toast.show();
+                            s.setSelection(listsize);
+                            break;
+                        case "\uD83D\uDEAA Aule     ":
+                            Intent i = new Intent(MainActivity.this, aule.class);
 
-                        s.setSelection(listsize);
-                        break;
-                    case "⌚ Orario   ":
-                        s.setSelection(listsize);
-                        break;
-                }
+                            i.putExtra("polygons", pol);
+                            startActivity(i);
+
+                            s.setSelection(listsize);
+                            break;
+                        case "⌚ Orario   ":
+                            Intent openPage2 = new Intent(MainActivity.this, Orario.class);
+                            startActivity(openPage2);
+                            s.setSelection(listsize);
+                            break;
+                        default:
+                            break;
+                    }
+
             }
             public void onNothingSelected(AdapterView<?> parent) {
             }
@@ -332,6 +351,31 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    /*
+     *** Metodo per leggere i valori per controllo se l'utente è già loggato
+     */
+
+    public Boolean loadSp(){
+
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        boolean text = sp.getBoolean("log1",false);
+        return text;
+    }
+
+    /*
+     *** Metodo per cambiare i valori per controllo se l'utente è già loggato
+     */
+
+    public void changeSp(){
+
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        SharedPreferences.Editor ed = sp.edit();        //Per editarlo
+        ed.putBoolean("log1",false);         //imposto a logged e in base al suo valore imposta true\false
+        ed.apply();
+    }
+
+
+
 
 
     public void setMarker() {
@@ -379,7 +423,6 @@ public class MainActivity extends AppCompatActivity{
         resetColor();
 
         getPassedValue();
-
 
         }
         else{

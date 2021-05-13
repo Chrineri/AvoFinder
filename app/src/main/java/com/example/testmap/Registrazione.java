@@ -67,22 +67,7 @@ public class Registrazione extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registrazione);
 
-        /*
-         *** Salvo email
-         */
-        eMail = findViewById(R.id.email);
-        email = eMail.getText();
 
-        /*
-         *** Salvo password
-         */
-        psw = findViewById(R.id.psw);
-        pass = psw.getText();
-        /*
-         *** Salvo pswControllo
-         */
-        pswControllo = findViewById(R.id.pswC);
-        passControllo = pswControllo.getText();
 
         /*
          ***Lettura dei dati dalla pagina php che si collega al database
@@ -185,6 +170,24 @@ public class Registrazione extends AppCompatActivity {
                 boolean contrE1 = false; //Controllo per dominio
                 boolean contrP = false; //Controllo per password
                 boolean contrPC = false; //Controllo per pswControllo
+                //////////////////////////////////////////////////////////////////
+                /*
+                 *** Salvo email
+                 */
+                eMail = findViewById(R.id.email);
+                email = eMail.getText();
+
+                /*
+                 *** Salvo password
+                 */
+                psw = findViewById(R.id.psw);
+                pass = psw.getText();
+                /*
+                 *** Salvo pswControllo
+                 */
+                pswControllo = findViewById(R.id.pswC);
+                passControllo = pswControllo.getText();
+                //////////////////////////////////////////////////////////////////
                 //Editable ---> String
                  e = email.toString();
                  p = pass.toString();
