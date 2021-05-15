@@ -3,6 +3,7 @@ package com.example.testmap;
 
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -107,12 +108,53 @@ public class aule extends AppCompatActivity {
                 return false;
             }
         });
-
-
-
     }
 
+    public Boolean loadSp(){
 
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        boolean text = sp.getBoolean("log1",false);
+        return text;
+    }
 
+    public Boolean loadSp2(){
 
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        boolean text1 = sp.getBoolean("log2",false);
+        return text1;
+    }
+
+    public void changeSp(){
+
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        SharedPreferences.Editor ed = sp.edit();        //Per editarlo
+        ed.putBoolean("log1",false);         //imposto a logged e in base al suo valore imposta true\false
+        System.out.println(loadSp());
+        ed.commit();
+    }
+
+    @Override
+    protected void onStop() {
+        System.out.println("ciaooooooooooooooooooooo");
+        if(!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
+            changeSp();
+            System.out.println("ciaooo: " + loadSp());
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        System.out.println("ciaooooooooooooooooooooo");
+        if(!loadSp2()){         //Contiene se l'utente vuole rimanere loggato
+            changeSp();
+            System.out.println("ciaooo: "+loadSp());
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }

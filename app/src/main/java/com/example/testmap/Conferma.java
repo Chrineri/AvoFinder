@@ -25,4 +25,9 @@ public class Conferma extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }

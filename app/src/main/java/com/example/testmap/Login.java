@@ -120,6 +120,7 @@ public class Login extends AppCompatActivity {
                 ////////////////////////////////////////////////////////////
                 //Editable ---> String
                 e = email.toString();
+                e = e.replace(" ","");
                 p = pass.toString();
                 System.out.println("-------------------------------TASTO LOGIN------------------------------");
                 /*
@@ -156,6 +157,11 @@ public class Login extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    @Override
+    public void onBackPressed() {
 
     }
 
@@ -224,18 +230,20 @@ public class Login extends AppCompatActivity {
 
         @Override
         public void run() {
-
-            switch(ricevo) {
+            String[] split = ricevo.split(";");
+            switch(split[0]) {
                 case "1":
                     System.out.println("Login effettuato con successo");
                     //Mettere intent
-                    System.out.println(logged);
+                    System.out.println("classe: "+split[1]);
                     /*
                     ***Settare variabili per keep me logged
                      */
                     SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);      //Creo sharedPreferences
                     SharedPreferences.Editor ed = sp.edit();        //Per editarlo
-                    ed.putBoolean("log1",logged);         //imposto a logged e in base al suo valore imposta true\false
+                    ed.putBoolean("log1",true);         //imposto a logged true perchè si è loggato
+                    ed.putBoolean("log2",logged);       //Indica se l'utente vuole rimanere loggato(true) o no(false)
+                    ed.putString("classe",split[1]);    //Indica la classe
                     ed.apply();                         //Applico
 
                     Intent openPage1 = new Intent(Login.this,MainActivity.class);
@@ -245,7 +253,6 @@ public class Login extends AppCompatActivity {
                 case "2":
                     password.setError("Errore nel login");
                     break;
-
             }
 
         }

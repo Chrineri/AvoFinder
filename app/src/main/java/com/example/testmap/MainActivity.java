@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity{
     Button b2;
     Button b3;
     Button b4;
+    TextView tf;
 
 
 
@@ -110,6 +112,7 @@ public class MainActivity extends AppCompatActivity{
 
 
 
+        System.out.println("Cioaoooo1: "+loadSp());
         s = findViewById(R.id.Spinner);
         List<String> list = new ArrayList<String>();
         if(!loadSp())
@@ -246,7 +249,8 @@ public class MainActivity extends AppCompatActivity{
         b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
         b0.setTextColor(Color.WHITE);
 
-
+        tf = (TextView) findViewById(R.id.floor1);
+        tf.setText(String.valueOf("P: "+piano));
 
 
 
@@ -361,6 +365,16 @@ public class MainActivity extends AppCompatActivity{
         boolean text = sp.getBoolean("log1",false);
         return text;
     }
+    /*
+     *** Metodo per controllare se l'utente vuole rimanere registrato
+     */
+
+    public Boolean loadSp2(){
+
+        SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
+        boolean text1 = sp.getBoolean("log2",false);
+        return text1;
+    }
 
     /*
      *** Metodo per cambiare i valori per controllo se l'utente è già loggato
@@ -371,7 +385,7 @@ public class MainActivity extends AppCompatActivity{
         SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);
         SharedPreferences.Editor ed = sp.edit();        //Per editarlo
         ed.putBoolean("log1",false);         //imposto a logged e in base al suo valore imposta true\false
-        ed.apply();
+        ed.commit();
     }
 
 
@@ -414,6 +428,25 @@ public class MainActivity extends AppCompatActivity{
 
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
+    /*
+    *** Metodo per uscire dall'account quando chiudo l'applicazione
+     */
+
+    @Override
+    protected void onStop() {
+        System.out.println("ciaooooooooooooooooooooo");
+        if(!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
+            changeSp();
+            System.out.println("ciaooo: " + loadSp());
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -469,7 +502,7 @@ public class MainActivity extends AppCompatActivity{
 
     public void setFloor(){
         map.getOverlays().clear();
-
+        tf.setText(String.valueOf("P: "+piano));
         switch(piano){
             case 0: map.getOverlays().addAll(p0);break;
             case 1: map.getOverlays().addAll(p1);break;
@@ -531,6 +564,7 @@ public class MainActivity extends AppCompatActivity{
             map.getOverlays().clear();
             passed = getClass.split(";");
             piano = Integer.parseInt(passed[1]);
+            tf.setText("P: "+piano);
             switch(Integer.parseInt(passed[1])){
                 case 0:
 
