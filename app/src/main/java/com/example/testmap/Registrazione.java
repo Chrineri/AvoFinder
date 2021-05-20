@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.text.Editable;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -61,12 +62,22 @@ public class Registrazione extends AppCompatActivity {
     List < String > list = new ArrayList < String > ();
     String e="";
     String p="";
+    TextView scritta1,scritta2;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registrazione);
+        scritta1 =findViewById(R.id.scritta1);
 
+        scritta1.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 40, 1, TypedValue.COMPLEX_UNIT_DIP);
+
+        scritta2 =findViewById(R.id.scritta2);
+
+        scritta2.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
 
 
         /*
@@ -190,7 +201,9 @@ public class Registrazione extends AppCompatActivity {
                 //////////////////////////////////////////////////////////////////
                 //Editable ---> String
                  e = email.toString();
+                 e = e.replace(" ",""); //Rimuovo gli spazi dall'email
                  p = pass.toString();
+                 p = p.replace(" ",""); //Rimuovo gli spazi dalla password
                 String pC = passControllo.toString();
 
                 System.out.println("email:" + e + " psw:" + p + " pswC:" + pC + sceltaSpinner);

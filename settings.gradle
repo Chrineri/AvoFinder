@@ -1,2 +1,3 @@
-include ':app'
+include ':app', ':timetableview'
 rootProject.name = "TestMap"
+project(':timetableview').projectDir = new File('libs/timetableview')

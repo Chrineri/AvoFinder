@@ -16,6 +16,7 @@ import android.os.Bundle;
 
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.TypedValue;
 import android.view.View;
 
 import android.widget.AdapterView;
@@ -26,7 +27,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -53,7 +56,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
 
 
 public class MainActivity extends AppCompatActivity{
@@ -80,21 +83,18 @@ public class MainActivity extends AppCompatActivity{
     Button b3;
     Button b4;
     TextView tf;
+    boolean controllo = false;  //controllo per onStop()
+    TextView floor1;
 
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("UseCompatLoadingForColorStateLists")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
+         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
          super.onCreate(savedInstanceState);
 
-
-
-
-
-        Context ctx = getApplicationContext();
+         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-        System.out.println("Cioaoooo1: "+loadSp());
+        System.out.println("Appena entrato in mappa: "+loadSp());
         s = findViewById(R.id.Spinner);
         List<String> list = new ArrayList<String>();
         if(!loadSp())
@@ -196,11 +196,13 @@ public class MainActivity extends AppCompatActivity{
                     switch (item.toString()) {
                         case "\uD83D\uDC64 Login    ":
                             s.setSelection(listsize);
+                            controllo = true;       //Se controllo è true indica che l'utente ha premuto un bottone e non bisogna rimuovere le variabili di sessioni
                             Intent openPage1 = new Intent(MainActivity.this, Login.class);
                             startActivity(openPage1);
                             break;
                         case "\uD83D\uDC4B Logout    ":
                             changeSp();
+                            System.out.println(loadSp());
                             Intent openPage3 = new Intent(MainActivity.this, MainActivity.class);
                             startActivity(openPage3);
                             Toast toast = Toast.makeText(getApplicationContext(), "Logout effettuato correttamente", Toast.LENGTH_SHORT);
@@ -208,16 +210,18 @@ public class MainActivity extends AppCompatActivity{
                             s.setSelection(listsize);
                             break;
                         case "\uD83D\uDEAA Aule     ":
+                            controllo = true;       //Se controllo è true indica che l'utente ha premuto un bottone e non bisogna rimuovere le variabili di sessioni
                             Intent i = new Intent(MainActivity.this, aule.class);
-
                             i.putExtra("polygons", pol);
                             startActivity(i);
 
                             s.setSelection(listsize);
                             break;
                         case "⌚ Orario   ":
-                            Intent openPage2 = new Intent(MainActivity.this, Orario.class);
-                            startActivity(openPage2);
+                                controllo = true;       //Se controllo è true indica che l'utente ha premuto un bottone e non bisogna rimuovere le variabili di sessioni
+                                Intent openPage2 = new Intent(MainActivity.this, Orario.class);
+                                startActivity(openPage2);
+
                             s.setSelection(listsize);
                             break;
                         default:
@@ -251,6 +255,19 @@ public class MainActivity extends AppCompatActivity{
 
         tf = (TextView) findViewById(R.id.floor1);
         tf.setText(String.valueOf("P: "+piano));
+        tf.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+        b0.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+        b1.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+        b2.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+        b3.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+        b4.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
+
 
 
 
@@ -434,11 +451,15 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     protected void onStop() {
-        System.out.println("ciaooooooooooooooooooooo");
-        if(!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
-            changeSp();
-            System.out.println("ciaooo: " + loadSp());
+        System.out.println("ciaooooooo "+controllo);
+        if(!controllo) { //Se controllo è false indica che l'utente non ha premuto il tasto per uscire e quindi bisogna modificare le variabili di sessione
+            if (!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
+                changeSp();
+            }
+
         }
+        controllo = false;  //Ri-imposto a false
+        System.out.println("ciaooooooo1 "+controllo);
         super.onStop();
     }
 
@@ -454,7 +475,6 @@ public class MainActivity extends AppCompatActivity{
         getClass = intent.getExtras().getString("class");
         c.setChecked(false);
         resetColor();
-
         getPassedValue();
 
         }

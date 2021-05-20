@@ -37,6 +37,7 @@ public class aule extends AppCompatActivity {
     String[] s;
     LinearLayout l;
     List<Button> buttons = new ArrayList<>();
+    boolean controllo = false;  //controllo per onStop()
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +48,7 @@ public class aule extends AppCompatActivity {
         ImageButton b1 = findViewById(R.id.back);
         b1.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                controllo = true;       //Se controllo è true indica che l'utente ha premuto il tasto per tornare al mainActivity
                 Intent i = new Intent(aule.this, MainActivity.class);
                 i.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(i);
@@ -71,6 +73,7 @@ public class aule extends AppCompatActivity {
                 int count = i;
                 b.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
+                        controllo = true;       //Se controllo è true indica che l'utente ha premuto il tasto per tornare al mainActivity
                         Intent i = new Intent(aule.this, MainActivity.class);
                         i.setFlags(FLAG_ACTIVITY_REORDER_TO_FRONT);
                         i.putExtra("class", s[count] + ";" + pass[1]);
@@ -135,22 +138,14 @@ public class aule extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        System.out.println("ciaooooooooooooooooooooo");
-        if(!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
-            changeSp();
-            System.out.println("ciaooo: " + loadSp());
+        if(!controllo) { //Se controllo è false indica che l'utente non ha premuto il tasto per uscire e quindi bisogna modificare le variabili di sessione
+            System.out.println("ciaooooooooooooooooooooo");
+            if (!loadSp2()) {         //Contiene se l'utente vuole rimanere loggato
+                changeSp();
+                System.out.println("ciaooo: " + loadSp());
+            }
         }
         super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        System.out.println("ciaooooooooooooooooooooo");
-        if(!loadSp2()){         //Contiene se l'utente vuole rimanere loggato
-            changeSp();
-            System.out.println("ciaooo: "+loadSp());
-        }
-        super.onDestroy();
     }
 
     @Override

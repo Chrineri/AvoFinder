@@ -7,4 +7,17 @@
     <string name="bottReg">Registrati</string>
     <string name="login">Login</string>
     <string name="torna_al_login">Torna al Login</string>
+    <string name="scritta1">scritta1</string>
+    <string name="scritta2">scritta2</string>
+    <string name="box">box</string>
+
+    <string-array name="my_header_title">
+        <item></item>
+        <item>Lunedì</item>
+        <item>Martedì</item>
+        <item>Mercoledì</item>
+        <item>Giovedì</item>
+        <item>Venerdì</item>
+        <item>Sabato</item>
+    </string-array>
 </resources>

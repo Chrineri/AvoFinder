@@ -11,4 +11,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <string-array name="this_colors">
+        <item>#345fff</item>
+        <item>#123456</item>
+        <item>#ff12ff</item>
+
+    </string-array>
+
 </resources>

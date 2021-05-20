@@ -1,12 +1,15 @@
 package com.example.testmap;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -46,16 +49,27 @@ public class Login extends AppCompatActivity {
     Handler ClientHandler;
     String e = "";
     String p = "";
+    TextView scritta1,scritta2;
     //Per mantenere loggato
     private CheckBox checkBox;
     private boolean logged;
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
+        scritta1 =findViewById(R.id.scritta1);
+
+        scritta1.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 40, 1, TypedValue.COMPLEX_UNIT_DIP);
+
+        scritta2 =findViewById(R.id.scritta2);
+
+        scritta2.setAutoSizeTextTypeUniformWithConfiguration(
+                1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
         /*
         ***Bottone per andare alla registrazione se non si è registrati
          */
@@ -120,8 +134,9 @@ public class Login extends AppCompatActivity {
                 ////////////////////////////////////////////////////////////
                 //Editable ---> String
                 e = email.toString();
-                e = e.replace(" ","");
+                e = e.replace(" ","");  //Rimuovo gli spazi dall'email
                 p = pass.toString();
+                p = p.replace(" ",""); //Rimuovo gli spazi dalla password
                 System.out.println("-------------------------------TASTO LOGIN------------------------------");
                 /*
                 ***Controllo se email è vuoto
