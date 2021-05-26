@@ -18,4 +18,4 @@ sia degli studenti che dei nuovi insegnanti, le aule all'interno della scuola.</
 Abbiamo realizzato la mappa partendo da un file GeoJSON precedentemente creato da alcuni studenti dell'Avogadro. 
 Per la parte backend abbiamo realizzato un server Java che si interfaccia con un sito Altervista contenente il database mySQL. 
 Inoltre vi è un sito creato in HTML, CSS, JS e PHP per la gestione del database, accesso che sarà disponibile solo a un utente admin.
-L'applicazione permette inoltre di visualizzare l'orario sia degli studenti che dei professori, questo è stato possibile grazie all'utilizzo di una libreria [TimeTableView]: https://github.com/tlaabs/TimetableView creata da un utente GitHub.
+L'applicazione permette inoltre di visualizzare l'orario sia degli studenti che dei professori, questo è stato possibile grazie all'utilizzo di una libreria [I'm an inline-style link](https://www.google.com) [TimeTableView]: https://github.com/tlaabs/TimetableView creata da un utente GitHub.
