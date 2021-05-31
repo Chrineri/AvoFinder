@@ -1,4 +1,4 @@
-package com.example.testmap;
+package com.app.avofinder;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.View;
@@ -56,48 +55,47 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.content.Intent.FLAG_ACTIVITY_REORDER_TO_FRONT;
-
 
 public class MainActivity extends AppCompatActivity{
     private final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
-    private MapView map = null;
-    private List l;
-    private List<Polygon> p = null;
-    private List<Polygon> p0 = new ArrayList<>();
-    private List<Polygon> p1 = new ArrayList<>();
-    private List<Polygon> p2 = new ArrayList<>();
-    private List<Polygon> p3 = new ArrayList<>();
-    private List<Polygon> p4 = new ArrayList<>();
-    private int piano = 0;
-    List<Marker> markers = new ArrayList<>();
-    Spinner s;
-    String getClass="";
-    CheckBox c;
-    String[] pol;
-    Polygon[] stu;
-    String[] passed;
-    Button b0;
-    Button b1;
-    Button b2;
-    Button b3;
-    Button b4;
-    TextView tf;
+    private MapView map = null; //Oggetto mappa
+    private List l; //Lista che contiene tutti gli oggetti presenti nel file GeoJSON
+    private List<Polygon> p = null; //Lista che contiene tutti i poligoni presenti nel file GeoJSON
+    private List<Polygon> p0 = new ArrayList<>(); //Lista che contiene i poligoni del piano 0
+    private List<Polygon> p1 = new ArrayList<>(); //Lista che contiene i poligoni del piano 1
+    private List<Polygon> p2 = new ArrayList<>(); //Lista che contiene i poligoni del piano 2
+    private List<Polygon> p3 = new ArrayList<>(); //Lista che contiene i poligoni del piano 3
+    private List<Polygon> p4 = new ArrayList<>(); //Lista che contiene i poligoni del piano 4
+    private int piano = 0; //Variabile per definire il piano corrente (necessaria per lo scambio di piani)
+    List<Marker> markers = new ArrayList<>(); //Lista che contiene tutti i markers contenenti i nomi delle aule che verranno visualizzati su ogni poligono
+    Spinner s; //Spinner per la scelta della pagina (login o logout, aule e orario)
+    String getClass=""; //Variabile utilizzata per prendere i parametri provenienti dalle diverse activty quali classe e piano necessarie per la visualizzazione sulla mappa
+    CheckBox c; //Checkbox per la visualizzazione o meno dei markers sulla mappa
+    String[] pol; //Array di poligoni che viene passato alla classe aule contenente tutti i poligoni presenti nella mappa
+    String[] passed; //Variabile contenente lo split del valore ricevuto dalle altre activity (getClass). A posizione 0 vi è il nome dell'aula e a posizione 1 il piano
+    Button b0; //Bottone per il passaggio al piano 0
+    Button b1; //Bottone per il passaggio al piano 1
+    Button b2; //Bottone per il passaggio al piano 2
+    Button b3; //Bottone per il passaggio al piano 3
+    Button b4; //Bottone per il passaggio al piano 4
+    TextView tf; //TextView che mostra il piano in cui ci troviamo attualmente
     boolean controllo = false;  //controllo per onStop()
-    TextView floor1;
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("UseCompatLoadingForColorStateLists")
     @Override
     public void onCreate(Bundle savedInstanceState) {
-         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO); //La modalità notte sarà uguale alla modalità giorno
          super.onCreate(savedInstanceState);
 
+
+         //Configurazione preliminare per le preferenze di sistema
          Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
 
+        //Controllo dei permessi necessari al funzionamento della mappa, se non vi sono stati dati i permessi verranno richiesti all'avvio dell'applicazione
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             } else {
@@ -107,13 +105,13 @@ public class MainActivity extends AppCompatActivity{
         }
 
 
-
+        //Inizializzazione dell'interfaccia grafica
         setContentView(R.layout.activity_main);
 
 
 
-        System.out.println("Appena entrato in mappa: "+loadSp());
-        s = findViewById(R.id.Spinner);
+        s = findViewById(R.id.Spinner); //Inizializzazione spinner
+        //Aggiunta dei vari elementi all'interno dello spinner
         List<String> list = new ArrayList<String>();
         if(!loadSp())
             list.add("\uD83D\uDC64 Login    ");
@@ -139,13 +137,13 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-
-        map = (MapView) findViewById(R.id.map);  //Creazione dell'oggetto mapView
+        //Inizializzazione della mappa
+        map = (MapView) findViewById(R.id.map);  //Creazione dell'oggetto MapView
         map.setTileSource(TileSourceFactory.MAPNIK);  //Imposto il tipo di mappa
-        map.setTilesScaledToDpi(true);
-        RotationGestureOverlay rg = new RotationGestureOverlay(map);
-        rg.setEnabled(true);
-        map.setMultiTouchControls(true);  //Abilito lo zoom con le dita
+        map.setTilesScaledToDpi(true); //Imposta lo scaling della mappa ai DPI del display utilizzato in quel momento
+        RotationGestureOverlay rg = new RotationGestureOverlay(map); //Oggetto necessario all'abilitazione dei gesti di rotazione all'interno della mappa
+        rg.setEnabled(true); //Permetto la rotazione della mappa
+        map.setMultiTouchControls(true);  //Abilito lo zoom con due dita
 
 
 
@@ -173,29 +171,29 @@ public class MainActivity extends AppCompatActivity{
         //Vado a impostare i paramentri per l'inserimento della piantina formato KML nella mappa OSM
         @SuppressLint("UseCompatLoadingForDrawables") Drawable defaultMarker = getResources().getDrawable(R.drawable.marker_default);
         Bitmap defaultBitmap = ((BitmapDrawable) defaultMarker).getBitmap();
-        Style defaultStyle = new Style(defaultBitmap, Color.parseColor("#104281"), 5f, Color.parseColor("#f1c047"));
-        FolderOverlay geoJsonOverlay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(map, defaultStyle, null, kmlDocument);
+        Style defaultStyle = new Style(defaultBitmap, Color.parseColor("#104281"), 5f, Color.parseColor("#f1c047")); //Imposto lo stile dei poligoni della mappa
+        FolderOverlay geoJsonOverlay = (FolderOverlay) kmlDocument.mKmlRoot.buildOverlay(map, defaultStyle, null, kmlDocument); //Imposto l'overlay visualizzato sulla mappa contenente i poligoni
 
         l = geoJsonOverlay.getItems(); //Prendo tutti gli oggetti che compongono la piantina scolastica
-        c = (CheckBox) findViewById(R.id.check);
+        c = (CheckBox) findViewById(R.id.check); //Inizializzo il checkbox
 
         //Metto ogni oggetto in un arraylist di polygoni
         p = (List<Polygon>) l;
-        pol  = new String[p.size()];
+        pol  = new String[p.size()]; //Inizializzo l'array di poligoni utile per la classe aule
 
-
+        //Creo e avvio il thread che aggiunge gli elementi nei vari array (utile per non abbassare le prestazioni del thread principale)
         myThread t = new myThread();
         t.start();
 
 
-
+        //Imposto un item listener sullo spinner che mi permetterà il passaggio tra le varie activity
         s.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
                 Object item = parent.getItemAtPosition(pos);
 
                     switch (item.toString()) {
                         case "\uD83D\uDC64 Login    ":
-                            s.setSelection(listsize);
+                            s.setSelection(listsize); //Imposto lo spinner al valore nullo in modo tale che non si vedano scritte che coprono
                             controllo = true;       //Se controllo è true indica che l'utente ha premuto un bottone e non bisogna rimuovere le variabili di sessioni
                             Intent openPage1 = new Intent(MainActivity.this, Login.class);
                             startActivity(openPage1);
@@ -212,7 +210,7 @@ public class MainActivity extends AppCompatActivity{
                         case "\uD83D\uDEAA Aule     ":
                             controllo = true;       //Se controllo è true indica che l'utente ha premuto un bottone e non bisogna rimuovere le variabili di sessioni
                             Intent i = new Intent(MainActivity.this, aule.class);
-                            i.putExtra("polygons", pol);
+                            i.putExtra("polygons", pol); //Passo l'array contenente tutte le aule e i relativi piani
                             startActivity(i);
 
                             s.setSelection(listsize);
@@ -234,27 +232,30 @@ public class MainActivity extends AppCompatActivity{
         });
 
 
-        setInfoWindow();
+        setInfoWindow(); //Metodo che imposta le infowindow personalizzate
 
-        getPassedValue();
+        getPassedValue(); //Richiamo il metodo che controlla e processa il valore passato dalle altre activity
+        //Se la variabile contenente i valori ricevuti dalle altre activity è vuota non faccio niente altrimento imposto il piano 0 di default
         if(getIntent().hasExtra("class")){
+
         }else {
             setInitialFloor();
         }
 
 
-
+        //Inizializzazione dei bottoni
         b0 = (Button) findViewById(R.id.l0);
         b1 = (Button) findViewById(R.id.l1);
         b2 = (Button) findViewById(R.id.l2);
         b3 = (Button) findViewById(R.id.l3);
         b4 = (Button) findViewById(R.id.l4);
 
-        b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-        b0.setTextColor(Color.WHITE);
+        b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray)); //Imposto il colore del bottone di default
+        b0.setTextColor(Color.WHITE); //Imposto il colore del testo del bottoness
 
-        tf = (TextView) findViewById(R.id.floor1);
-        tf.setText(String.valueOf("P: "+piano));
+        tf = (TextView) findViewById(R.id.floor1); //Inizializzazione del textview per la visualizzazione del piano attuale
+        tf.setText(String.valueOf("P: "+piano)); //Imposto il valore del piano nel textview
+        //Parametri per l'autoridimensionamento dei bottoni e dei testi
         tf.setAutoSizeTextTypeUniformWithConfiguration(
                 1, 20, 1, TypedValue.COMPLEX_UNIT_DIP);
         b0.setAutoSizeTextTypeUniformWithConfiguration(
@@ -271,17 +272,17 @@ public class MainActivity extends AppCompatActivity{
 
 
 
-
+        //Aggiungo i listener sul click a ogni bottone
         b0.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                setDefaultColor(b0,b1,b2,b3,b4);
-                resetColor();
-                b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                b0.setTextColor(Color.WHITE);
-                piano = 0;
-                setFloor();
-                rg.setEnabled(true);
-                map.getOverlays().add(rg);
+                setDefaultColor(b0,b1,b2,b3,b4); //Imposto i colori dei bottoni a quelli di default
+                resetColor(); //Metodo che reimposta il colore dei poligoni in base al piano selezionato
+                b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray)); //Resetto il colore dei bottoni
+                b0.setTextColor(Color.WHITE); //Imposto il colore del testo dei bottoni
+                piano = 0; //Imposto il numero del piano selezionato
+                setFloor(); //Imposto il piano con i relativi poligoni
+                rg.setEnabled(true); //Aggiungo la possibilità di ruotare la mappa
+                map.getOverlays().add(rg); //Aggiungo la rotazione alla mappa
 
             }
         });
@@ -294,8 +295,6 @@ public class MainActivity extends AppCompatActivity{
                 b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                 b1.setTextColor(Color.WHITE);
                 piano = 1;
-
-
                 setFloor();
                 rg.setEnabled(true);
                 map.getOverlays().add(rg);
@@ -309,7 +308,6 @@ public class MainActivity extends AppCompatActivity{
                 b2.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                 b2.setTextColor(Color.WHITE);
                 piano = 2;
-
                 setFloor();
                 rg.setEnabled(true);
                 map.getOverlays().add(rg);
@@ -323,7 +321,6 @@ public class MainActivity extends AppCompatActivity{
                 b3.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                 b3.setTextColor(Color.WHITE);
                 piano = 3;
-
                 setFloor();
                 rg.setEnabled(true);
                 map.getOverlays().add(rg);
@@ -337,7 +334,6 @@ public class MainActivity extends AppCompatActivity{
                 b4.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                 b4.setTextColor(Color.WHITE);
                 piano = 4;
-
                 setFloor();
                 rg.setEnabled(true);
                 map.getOverlays().add(rg);
@@ -347,23 +343,25 @@ public class MainActivity extends AppCompatActivity{
 
         c.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                resetColor();
-                checkCheckbox();
+                resetColor(); //Metodo che imposta i colori dei poligoni in base al piano selezionato
+                checkCheckbox(); //Metodo che verifica se il checkbox è selezionato o meno per l'aggiunta dei markers
             }
         });
 
-        //map.getOverlays().add(geoJsonOverlay);
+        //map.getOverlays().add(geoJsonOverlay); //metodo che permette di aggiungere l'overlay contenente tutti i poligoni, precedentemente creato, alla mappa
 
-        map.setHorizontalMapRepetitionEnabled(false);
-        map.setVerticalMapRepetitionEnabled(false);
-        IMapController mapController = map.getController();
-        mapController.setZoom((double)18);
-        GeoPoint startPoint = new GeoPoint(45.07122657916548,7.692658552021214);
-        mapController.setCenter(startPoint);
-        map.setMinZoomLevel((double) 18);
-        map.setScrollableAreaLimitLatitude(45.07146656030419, 45.06952171642693,10);
-        map.setScrollableAreaLimitLongitude(7.69138,7.693766902971969,10);
-        map.getOverlays().add(rg);
+        map.setHorizontalMapRepetitionEnabled(false); //Disabilito la ripetizione della mappa orizzontalmente
+        map.setVerticalMapRepetitionEnabled(false); //Disabilito la ripetizione della mappa verticalmente
+        IMapController mapController = map.getController(); //Oggetto per gestire alcuni parametri della mappa
+        mapController.setZoom((double)18); //Imposto il livello iniziale di zoom
+        GeoPoint startPoint = new GeoPoint(45.07122657916548,7.692658552021214); //Creo un oggetto GeoPoint contenente la posizione di partenza della mappa (sulla scuola)
+        mapController.setCenter(startPoint); //Imposto la posizione della mappa sul punto precedentemente creato
+        map.setMinZoomLevel((double) 18); //Imposto il livello minimo di zoom
+        map.setScrollableAreaLimitLatitude(45.07146656030419, 45.06952171642693,10); //Limito lo scroll in latitudine
+        map.setScrollableAreaLimitLongitude(7.69138,7.693766902971969,10); //Limito lo scroll in longitudine
+        map.getOverlays().add(rg); //Aggiungo l'oggetto che permette la rotazione della mappa
+
+        //Metodo che richiede i permessi se necessario
         requestPermissionsIfNecessary(new String[] {
 
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -411,39 +409,41 @@ public class MainActivity extends AppCompatActivity{
 
     public void setMarker() {
         for(int i=0;i<markers.size();i++)
+            //Rimuovo i markers attualmente attivi
             map.getOverlayManager().remove(markers.get(i));
         for (int i = 0; i < p.size(); i++) {
+            //Controllo se il piano è presente nella descrizione del poligono
             if (p.get(i).getSubDescription().contains("level=" + piano)) {
                 if (p.get(i).getTitle() != null) {
-                    map.getOverlays().add(p.get(i));
+                    map.getOverlays().add(p.get(i)); //Aggiungo il poligono alla mappa
 
-                    Marker m = new Marker(map);
-                    m.setTextLabelBackgroundColor(Color.TRANSPARENT);
-                    m.setTextLabelForegroundColor(Color.BLACK);
-                    m.setTextIcon(p.get(i).getTitle());
-                    m.setPosition(p.get(i).getInfoWindowLocation());
-                    m.setInfoWindow(null);
-                    map.getOverlayManager().add(m);
-                    markers.add(m);
+                    Marker m = new Marker(map); //Creo un oggetto marker
+                    m.setTextLabelBackgroundColor(Color.TRANSPARENT); //Imposto il background del marker
+                    m.setTextLabelForegroundColor(Color.BLACK); //Imposto il colore del testo del marker
+                    m.setTextIcon(p.get(i).getTitle()); //Imposto il testo del marker
+                    m.setPosition(p.get(i).getInfoWindowLocation()); //Imposto la posizione del marker al centro del poligono
+                    m.setInfoWindow(null); //Imposto l'infowindow del marker a nullo
+                    map.getOverlayManager().add(m); //Aggiungo il marker sulla mappa
+                    markers.add(m); //Aggiungo il marker alla lista dei markers
                 }
             } else {
-                map.getOverlays().remove(p.get(i));
+                map.getOverlays().remove(p.get(i)); //Rimuovo il poligono se non appartenente al piano
             }
         }
-        map.invalidate();
+        map.invalidate(); //Aggiorno la mappa per vederne le modifiche
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        map.onResume(); //needed for compass, my location overlays, v6.0.0 and up
+        map.onResume(); //Metodo che gestisce la mappa quando viene richiamato onResume
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
+        map.onPause();  //Metodo che gestisce la mappa quando viene richiamato onPause
     }
     /*
     *** Metodo per uscire dall'account quando chiudo l'applicazione
@@ -463,28 +463,36 @@ public class MainActivity extends AppCompatActivity{
         super.onStop();
     }
 
+
     @Override
     public void onBackPressed() {
 
     }
 
+
+    //Metodo che permette di gestire l'intent quando viene "riesumato" dal background
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        //Controllo se le variabili ricevute dalle altre activity hanno un contenuto
         if(intent.hasExtra("class")){
-        getClass = intent.getExtras().getString("class");
-        c.setChecked(false);
-        resetColor();
-        getPassedValue();
+        InfoWindow.closeAllInfoWindowsOn(map); //Chiudo le finestre attive sulla mappa
+        getClass = intent.getExtras().getString("class"); //Prendo il valore passato dall'activity
+        c.setChecked(false); //Imposto il checkbox a false in modo da non creare conflitti
+        resetColor(); //Metodo che reimposta il colore dei poligoni in base al piano selezionato
+        getPassedValue(); //Richiamo il metodo che controlla e processa il valore passato dalle altre activity
 
         }
         else{
-            c.setChecked(false);
-            resetColor();
+            //Se non vi è nessun contenuto nelle variabili ricevute
+            c.setChecked(false); //Imposto il checkbox a false
+            resetColor(); //Metodo che reimposta il colore dei poligoni in base al piano selezionato
         }
 
     }
 
+
+    //Se i permessi necessari non sono stati dati li richiedo
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -521,8 +529,11 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void setFloor(){
-        map.getOverlays().clear();
-        tf.setText(String.valueOf("P: "+piano));
+
+        //Metodo che imposta il piano in base al bottone selezionato
+        map.getOverlays().clear(); //Pulisco la mappa
+        tf.setText(String.valueOf("P: "+piano)); //Imposto il textview in base al piano selezionato
+        //Controllo il piano e aggiugno i poligoni alla mappa relativi al piano
         switch(piano){
             case 0: map.getOverlays().addAll(p0);break;
             case 1: map.getOverlays().addAll(p1);break;
@@ -530,71 +541,79 @@ public class MainActivity extends AppCompatActivity{
             case 3: map.getOverlays().addAll(p3);break;
             case 4: map.getOverlays().addAll(p4);break;
         }
-
+        //Se il checkbox è attivo aggiungo i markers alla mappa
         if(c.isChecked()){
-            setMarker();
+            setMarker(); //Richiamo il metodo che imposta i markers
         }else{
+            //Chiudo le infowindow attualmente attive
             if(!InfoWindow.getOpenedInfoWindowsOn(map).isEmpty())
-            InfoWindow.closeAllInfoWindowsOn(map);
+                InfoWindow.closeAllInfoWindowsOn(map);
         }
-        map.invalidate();
+        map.invalidate(); //Aggiorno la mappa per attuare le modifiche
     }
 
+    //Metodo per il controllo dei checkbox
     public void checkCheckbox(){
+            //Se il checkbox e impostato vado ad aggiungere i markers
             if(c.isChecked()){
-                    InfoWindow.closeAllInfoWindowsOn(map);
+                    InfoWindow.closeAllInfoWindowsOn(map); //Chiudo le infowindow attive
                         for(int i=0;i<p.size();i++) {
-                        if(p.get(i).getSubDescription().contains("level="+piano)) {
-                            if(p.get(i).getTitle()!=null) {
-                                map.getOverlays().add(p.get(i));
+                            //Controllo se il piano è presente nella descrizione del poligono
+                            if(p.get(i).getSubDescription().contains("level="+piano)) {
+                                //Controllo se il titolo del poligono esiste
+                                if(p.get(i).getTitle()!=null) {
+                                    map.getOverlays().add(p.get(i)); //Aggiungo il poligono alla mappa
 
-                                Marker m = new Marker(map);
-                                m.setTextLabelBackgroundColor(Color.TRANSPARENT);
-                                m.setTextLabelForegroundColor(Color.BLACK);
-                                m.setTextIcon(p.get(i).getTitle());
-                                m.setPosition(p.get(i).getInfoWindowLocation());
-                                m.setInfoWindow(null);
-                                map.getOverlayManager().add(m);
-                                markers.add(m);
+                                    Marker m = new Marker(map); //Creo un oggetto marker
+                                    m.setTextLabelBackgroundColor(Color.TRANSPARENT); //Imposto il background del marker
+                                    m.setTextLabelForegroundColor(Color.BLACK); //Imposto il colore del testo del marker
+                                    m.setTextIcon(p.get(i).getTitle()); //Imposto il testo del marker
+                                    m.setPosition(p.get(i).getInfoWindowLocation()); //Imposto la posizione del marker al centro del poligono
+                                    m.setInfoWindow(null); //Imposto l'infowindow del marker a nullo
+                                    map.getOverlayManager().add(m); //Aggiungo il marker sulla mappa
+                                    markers.add(m); //Aggiungo il marker alla lista dei markers
+                                }
+                            }else {
+                                map.getOverlays().remove(p.get(i)); //Rimuovo i poligoni dalla mappa
                             }
-                        }else {
-                            map.getOverlays().remove(p.get(i));
-                        }
                     }
                 }else{
+                    //Se il checkbox non è selezionato rimuovo i markers dalla mappa
                     for(int i=0;i<markers.size();i++)
-                        map.getOverlayManager().remove(markers.get(i));
+                        map.getOverlayManager().remove(markers.get(i));//Rimuovo i markers dalla mappa
                 }
 
-                map.invalidate();
+                map.invalidate(); //Aggiorno la mappa in modo tale da vedere le modifiche
         }
 
 
 
 
     public void getPassedValue(){
-
+        //Controllo se la variabile getClass ha valori all'interno
         if(getIntent().hasExtra("class")){
             getClass = getIntent().getExtras().getString("class");
         }
 
         //cambio il colore dei poligoni selezionati e passati dall'activity aule
         if(!getClass.equals("")){
-            setDefaultColor(b0,b1,b2,b3,b4);
-            map.getOverlays().clear();
-            passed = getClass.split(";");
-            piano = Integer.parseInt(passed[1]);
-            tf.setText("P: "+piano);
+            setDefaultColor(b0,b1,b2,b3,b4); //Imposto i valori dei bottoni di default
+            map.getOverlays().clear(); //Pulisco la mappa
+            passed = getClass.split(";"); //Splitto la variabile getClass e ne prendo i valori quali aula e piano
+            piano = Integer.parseInt(passed[1]);    //Prendo il piano della classe premuta
+            tf.setText("P: "+piano); //Imposto il piano sul textview
+            //Controllo a che piano si trova l'aula ricevuta
             switch(Integer.parseInt(passed[1])){
+                //In base al piano vado ad aggiungere tutti i poligoni del piano relativo all'aula e imposto un colore diverso all'aula selezionata
                 case 0:
 
                     map.getOverlays().addAll(p0);
                     for(int i=0;i<p0.size();i++){
-                        if(passed[0].equals(p0.get(i).getTitle())){
-                            p0.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
-                            p0.get(i).showInfoWindow();
-                            b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
-                            b0.setTextColor(Color.WHITE);
+                        if(passed[0].equals(p0.get(i).getTitle())){ //Verifico se l'aula passata è presente nel pianp
+                            p0.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambio il colore dell'aula selezionata
+                            p0.get(i).showInfoWindow(); //Faccio comparire l'infowindow dell'aula contenente il titolo
+                            b0.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray)); //Imposto il colore del bottone a grigio (selezionato)
+                            b0.setTextColor(Color.WHITE); //Imposto il colore del testo del bottone
                         }
                     }
                     break;
@@ -602,7 +621,7 @@ public class MainActivity extends AppCompatActivity{
                     map.getOverlays().addAll(p1);
                     for(int i=0;i<p1.size();i++){
                         if(passed[0].equals(p1.get(i).getTitle())){
-                            p1.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p1.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambio il colore dell'aula selezionata
                             p1.get(i).showInfoWindow();
                             b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                             b1.setTextColor(Color.WHITE);
@@ -613,7 +632,7 @@ public class MainActivity extends AppCompatActivity{
                     map.getOverlays().addAll(p2);
                     for(int i=0;i<p2.size();i++){
                         if(passed[0].equals(p2.get(i).getTitle())){
-                            p2.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p2.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambio il colore dell'aula selezionata
                             p2.get(i).showInfoWindow();
                             b2.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                             b2.setTextColor(Color.WHITE);
@@ -624,7 +643,7 @@ public class MainActivity extends AppCompatActivity{
                     map.getOverlays().addAll(p3);
                     for(int i=0;i<p3.size();i++){
                         if(passed[0].equals(p3.get(i).getTitle())){
-                            p3.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p3.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambio il colore dell'aula selezionata
                             p3.get(i).showInfoWindow();
                             b3.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                             b3.setTextColor(Color.WHITE);
@@ -635,7 +654,7 @@ public class MainActivity extends AppCompatActivity{
                     map.getOverlays().addAll(p4);
                     for(int i=0;i<p4.size();i++){
                         if(passed[0].equals(p4.get(i).getTitle())){
-                            p4.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambiare i colori ai singoli poligoni
+                            p4.get(i).getFillPaint().setColor(Color.parseColor("#f17f46"));//Cambio il colore dell'aula selezionata
                             p4.get(i).showInfoWindow();
                             b4.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.gray));
                             b4.setTextColor(Color.WHITE);
@@ -643,31 +662,31 @@ public class MainActivity extends AppCompatActivity{
                     }
                     break;
             }
-            RotationGestureOverlay rg = new RotationGestureOverlay(map);
-            rg.setEnabled(true);
-            map.setMultiTouchControls(true);
-            map.getOverlays().add(rg);
+            RotationGestureOverlay rg = new RotationGestureOverlay(map); //Oggetto necessario all'abilitazione dei gesti di rotazione all'interno della mappa
+            rg.setEnabled(true); //Permetto la rotazione della mappa
+            map.setMultiTouchControls(true); //Permetto lo zoom con le dita
+            map.getOverlays().add(rg); //Aggiungo alla mappa l'oggetto che permette la rotazione
         }
-        map.invalidate();
+        map.invalidate(); //Agggiorno la mappa in modo da vedere le modifiche
     }
 
     public void setInitialFloor(){
         //Imposto il piano 0 inizialmente
         map.getOverlays().addAll(p0);
-        map.invalidate();
+        map.invalidate(); //Agggiorno la mappa in modo da vedere le modifiche
     }
 
     public void setInfoWindow(){
         for(int i=0;i<l.size();i++){
 
-            CustomInfoWindow ci = new CustomInfoWindow(map,p.get(i));
-            p.get(i).setInfoWindow(ci);
+            CustomInfoWindow ci = new CustomInfoWindow(map,p.get(i)); //Creo un oggetto infowindow personalizzata
+            p.get(i).setInfoWindow(ci); //imposto l'infowindow ad ogni poligono presente nella mappa
             int counter = i;//counter che serve al metodo sottostante
             p.get(i).setOnClickListener(new Polygon.OnClickListener() {
                 @Override
                 public boolean onClick(Polygon polygon, MapView mapView, GeoPoint eventPos) {
                     InfoWindow.closeAllInfoWindowsOn(map);//se viene cliccato un poligono diverso da quello attualmente attivo vengono chiuse tutte le infowindow attive
-                    p.get(counter).showInfoWindow();//attiva l'infowindow del poligono selezionato
+                    p.get(counter).showInfoWindow();//attiva l'infowindow del poligono selezionati
                     return true;
                 }
             });
@@ -677,7 +696,7 @@ public class MainActivity extends AppCompatActivity{
 
 
     public void addInArray(){
-        //Aggiungo i nomi delle aule in un array di strighe da passare alle altre activity
+        //Aggiungo i nomi delle aule in un array di strighe da passare alle altre activity contenente l'aula e il piano
 
         int index = 0;
         for(int i=0;i<p.size();i++){
@@ -700,9 +719,9 @@ public class MainActivity extends AppCompatActivity{
 
 
     public void resetColor(){
-
+        //Metodo che permette il reset dei colori dei poligoni a quelli di default in base al piano ricevuto
         if(passed!=null) {
-            InfoWindow.closeAllInfoWindowsOn(map);
+            InfoWindow.closeAllInfoWindowsOn(map); //Chiudo tutte le infowindow aperte sulla mappa se il valore ricevuto dalle altre activity e nullo
 
 
             switch (Integer.parseInt(passed[1])) {
@@ -731,7 +750,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-
+    //Metodo che imposta il colore dei bottoni a default
     private void setDefaultColor(Button b1,Button b2,Button b3,Button b4,Button b5){
         b1.setBackgroundTintList(getApplicationContext().getResources().getColorStateList(R.color.yellow));
         b1.setTextColor(Color.parseColor("#104281"));
@@ -749,7 +768,8 @@ public class MainActivity extends AppCompatActivity{
     class myThread extends Thread{
         @Override
         public void run() {
-            addInArray();
+            addInArray(); //Metodo che permette l'inserimento dei poligoni nell'array che verrà passato all'activity aule
+            //Smisto gli elementi della lista principale, contenente tutti i poligoni, nelle liste dei vari piani
             for(int i = 0;i<p.size();i++){
                 if(p.get(i).getSubDescription().contains("level=0"))
                     p0.add(p.get(i));

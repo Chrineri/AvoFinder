@@ -1,13 +1,13 @@
-package com.example.testmap;
+package com.app.avofinder;
 
 import android.widget.TextView;
 
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
 public class CustomInfoWindow extends MarkerInfoWindow {
+    //Infowindow personalizzata
     Polygon p;
 
     public CustomInfoWindow(MapView mapView, Polygon p) {

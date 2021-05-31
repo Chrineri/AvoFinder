@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.example.testmap",
+  "applicationId": "com.app.avofinder",
   "variantName": "processReleaseResources",
   "elements": [
     {

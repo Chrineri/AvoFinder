@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.testmap">
+    package="com.app.avofinder">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"  />
@@ -18,7 +18,7 @@
         android:theme="@style/myTheme"
         android:requestLegacyExternalStorage="true"
         >
-        <activity android:name=".MainActivity"
+        <activity android:name="com.app.avofinder.MainActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,22 +27,22 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".aule"
+        <activity android:name="com.app.avofinder.aule"
             android:excludeFromRecents="true">
 
         </activity>
 
-        <activity android:name=".Login" android:theme="@style/Theme.Registrazione1">
+        <activity android:name="com.app.avofinder.Login" android:theme="@style/Theme.Registrazione1">
 
         </activity>
 
-        <activity android:name=".Registrazione" android:theme="@style/Theme.Registrazione1">
+        <activity android:name="com.app.avofinder.Registrazione" android:theme="@style/Theme.Registrazione1">
 
         </activity>
-        <activity android:name=".Conferma" android:theme="@style/Theme.Registrazione1">
+        <activity android:name="com.app.avofinder.Conferma" android:theme="@style/Theme.Registrazione1">
 
         </activity>
-        <activity android:name=".Orario" android:screenOrientation="landscape" android:theme="@style/Theme.Registrazione1">
+        <activity android:name="com.app.avofinder.Orario" android:screenOrientation="landscape" android:theme="@style/Theme.Registrazione1">
 
         </activity>
         <meta-data

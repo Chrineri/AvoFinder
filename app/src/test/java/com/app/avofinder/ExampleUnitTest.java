@@ -1,4 +1,4 @@
-package com.example.testmap;
+package com.app.avofinder;
 
 import org.junit.Test;
 

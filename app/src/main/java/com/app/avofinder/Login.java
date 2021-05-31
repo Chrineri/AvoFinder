@@ -1,4 +1,4 @@
-package com.example.testmap;
+package com.app.avofinder;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,13 +13,10 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
-import com.example.testmap.R;
+import com.app.avofinder.R;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.BufferedReader;
@@ -27,9 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.math.BigInteger;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -189,48 +184,7 @@ public class Login extends AppCompatActivity {
 
         @Override
         public void run() {
-            try {
-                SSLSocketFactory factory =
-                        (SSLSocketFactory) SSLSocketFactory.getDefault();
-                SSLSocket socket =
-                        (SSLSocket) factory.createSocket("avofinder.altervista.org", 443);
 
-                socket.startHandshake();
-
-                BufferedWriter bw = null;
-                /*
-                 ***Applico Sha256 alla password (p)
-                 */
-                MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                byte[] hash = digest.digest(p.getBytes(StandardCharsets.UTF_8));
-                String pswCript = String.format("%064x", new BigInteger(1, hash));  //Viene inviata la password criptata
-
-                bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF8"));
-                bw.write("POST http://avofinder.altervista.org/index.php?email="+e+"&psw="+pswCript+"&contr=1 HTTP/1.1\r\n");
-                bw.write("Host: altervista\r\n");
-                bw.write("Cache-Control: no-cache\r\n");
-                bw.write("\r\n");
-                bw.flush();
-
-                /* leggo risposta */
-                String lineD;
-                BufferedReader br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                //Le prime otto righe dovrebbero essere sempre inutili
-                int c = 0;
-                while ((lineD = br.readLine()) != null) {
-                    c++;
-                    //c indica la riga da leggere, se è uguale a 9 indica che contiene i parametri che ci interessano
-                    if (c == 9) {
-                        System.out.println(lineD);
-                        ClientHandler.post(new Login.ClientHandler(lineD));
-                    }
-                }
-                br.close();
-                bw.close();
-                socket.close();
-            } catch (IOException | NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
 
 
         }
@@ -245,30 +199,7 @@ public class Login extends AppCompatActivity {
 
         @Override
         public void run() {
-            String[] split = ricevo.split(";");
-            switch(split[0]) {
-                case "1":
-                    System.out.println("Login effettuato con successo");
-                    //Mettere intent
-                    System.out.println("classe: "+split[1]);
-                    /*
-                    ***Settare variabili per keep me logged
-                     */
-                    SharedPreferences sp = getSharedPreferences("Login",MODE_PRIVATE);      //Creo sharedPreferences
-                    SharedPreferences.Editor ed = sp.edit();        //Per editarlo
-                    ed.putBoolean("log1",true);         //imposto a logged true perchè si è loggato
-                    ed.putBoolean("log2",logged);       //Indica se l'utente vuole rimanere loggato(true) o no(false)
-                    ed.putString("classe",split[1]);    //Indica la classe
-                    ed.apply();                         //Applico
 
-                    Intent openPage1 = new Intent(Login.this,MainActivity.class);
-                    startActivity(openPage1);
-
-                    break;
-                case "2":
-                    password.setError("Errore nel login");
-                    break;
-            }
 
         }
 
