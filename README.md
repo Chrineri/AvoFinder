@@ -20,5 +20,5 @@ Per la parte backend abbiamo realizzato un server Java che si interfaccia con un
 Inoltre vi è un sito creato in HTML, CSS, JS e PHP per la gestione del database, accesso che sarà disponibile solo a un utente admin.
 L'applicazione permette inoltre di visualizzare l'orario sia degli studenti che dei professori, questo è stato possibile grazie all'utilizzo di una libreria TimeTableView creata dll'utente GitHub tlaabs.
   
-** Nota bene ** <br>
+**Nota bene** <br>
 Il codice è stato privato di alcune funzioni per evitare la diffusione di dati sensibili esempio login e registrazione.
